@@ -7,6 +7,7 @@ function App() {
 
     //if 로 올바른(수정) 버튼인지 ( class 로 구분 )
     if(e.target.classList.contains("menu-edit-button")) {
+      
       const $menuName=e.target.closest("li").querySelector(".menu-name");
       // e.target 중 가장 가까운 li 찾음 ,, 이너텍스트로 텍스트 가져오기
       const updatedMenuName=prompt("메뉴명을 수정하세요", $menuName.innerText);// 인자 사용 유의하기
