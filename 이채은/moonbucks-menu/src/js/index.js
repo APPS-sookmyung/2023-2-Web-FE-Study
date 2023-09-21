@@ -8,8 +8,14 @@ function App() {
 
    // 메뉴의 이름을 입력받는건
    $("#espresso-menu-name").addEventListener("keypress", (e) => {
-      // console.log(e.key);
-      if (e.key === "Enter") {
+    if (e.key !== "Enter") { // 처음에 엔터를 눌러도 alert 안뜨게 
+      return;
+    }
+
+    if ($("#espresso-menu-name").value === "") {
+      alert("값을 입력해주세요.");
+      return; // 뒷부분(엔터가 실행되지 않도록)
+    }
          const espressoMenuName = $("#espresso-menu-name").value;
          const menuItemTemplate = (espressoMenuName) => {
             return `
@@ -32,7 +38,7 @@ function App() {
             $("#espresso-menu-list").insertAdjacentHTML("beforeend", menuItemTemplate(espressoMenuName));
             const menuCount = $("#espresso-menu-list").querySelectorAll("li").length
             $(".menu-count").innerText = `총 ${menuCount} 개`
-      }
+            $("#espresso-menu-name").value = "";
    });
 }
 
