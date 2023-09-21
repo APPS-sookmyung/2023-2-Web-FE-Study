@@ -7,30 +7,7 @@ function App() {
 		$(".menu-count").innerText = `총 ${menuCount} 개`;
 	};
 
-	$("#espresso-menu-list").addEventListener("click", (e) => {
-		//if 로 올바른(수정) 버튼인지 ( class 로 구분 )
-
-		if (e.target.classList.contains("menu-edit-button")) {
-			const $menuName = e.target.closest("li").querySelector(".menu-name");
-			// e.target 중 가장 가까운 li 찾음 ,, 이너텍스트로 텍스트 가져오기
-			const updatedMenuName = prompt("메뉴명을 수정하세요", $menuName.innerText); // 인자 사용 유의하기
-			$menuName.innerText = updatedMenuName;
-		}
-
-		if (e.target.classList.contains("menu-remove-button")) {
-			if (confirm("정말 삭제하시겠습니까?")) {
-				e.target.closest("li").remove();
-				updateMenuCount();
-			}
-		}
-	});
-
-	//form태그가 자동으로 전송되는걸 막아준다.
-	$("#espresso-menu-form").addEventListener("submit", (e) => {
-		e.preventDefault();
-	});
-
-	//재사용하는 부분
+	//재사용하는 부분을 한곳에 모아줌
 	const addMenuName = () => {
 		if ($("#espresso-menu-name").value === "") {
 			alert("값을 입력해주세요.");
@@ -61,9 +38,37 @@ function App() {
 		$("#espresso-menu-name").value = "";
 	};
 
-	$("#espresso-menu-submit-button").addEventListener("click", () => {
-		addMenuName();
+	const updateMenuName = (e) => {
+		const $menuName = e.target.closest("li").querySelector(".menu-name");
+		// e.target 중 가장 가까운 li 찾음. 이너텍스트로 텍스트 가져오기
+		const updatedMenuName = prompt("메뉴명을 수정하세요", $menuName.innerText); // 인자 사용 유의하기
+		$menuName.innerText = updatedMenuName; //e를 변수로 활용
+	};
+
+	const removeMenuName = (e) => {
+		if (confirm("정말 삭제하시겠습니까?")) {
+			e.target.closest("li").remove();
+			updateMenuCount(e);
+		}
+	};
+
+	$("#espresso-menu-list").addEventListener("click", (e) => {
+		//if 로 올바른(수정) 버튼인지 ( class 로 구분 )
+		if (e.target.classList.contains("menu-edit-button")) {
+			updateMenuName(e); //리팩터링
+		}
+
+		if (e.target.classList.contains("menu-remove-button")) {
+			removeMenuName(e); //리팩터링
+		}
 	});
+
+	//form태그가 자동으로 전송되는걸 막아준다.
+	$("#espresso-menu-form").addEventListener("submit", (e) => {
+		e.preventDefault();
+	});
+
+	$("#espresso-menu-submit-button").addEventListener("click", addMenuName);
 
 	// 메뉴의 이름을 입력받는건
 	$("#espresso-menu-name").addEventListener("keypress", (e) => {
