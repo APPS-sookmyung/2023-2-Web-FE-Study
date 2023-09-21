@@ -56,3 +56,6 @@ APPS 2023-2학기 웹 프론트엔드 스터디 저장소입니다.
 - 제목은 `[n주차 FE 스터디] 이름`으로 설정합니다.
   - ex) [2주차 FE 스터디] 홍길동
 <br>
+
+## 스터디 자료
+-  [블랙커피 Vanilla JS Lv1. 문벅스 카페 메뉴 앱 만들기](https://github.com/blackcoffee-study/moonbucks-menu)
