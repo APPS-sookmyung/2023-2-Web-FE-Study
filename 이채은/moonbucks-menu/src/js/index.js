@@ -94,6 +94,9 @@ function App() {
 
   const removeMenuName = (e) => {
     if (confirm("정말 삭제하시겠습니까?")) {
+      const menuId = e.target.closest("li").dataset.menuId;
+      this.menu.splice(menuId, 1); //배열의 특정 원소를 삭제하는 index  두번째 매개변수는 삭제할 개수 )
+      store.setLocalStorage(this.menu);
       e.target.closest("li").remove();
       updateMenuCount(e);
     }
