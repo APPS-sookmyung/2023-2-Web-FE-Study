@@ -1,5 +1,8 @@
 // TODO localStorage Read & Write
 // - [] localStorage에 데이터를 저장한다.
+// - [x] 메뉴를 추가할 때
+// - [] 메뉴를 수정할 때
+// - [] 메뉴를 삭제할 때
 // - [] localStorage에 있는 데이터를 읽어온다.
 
 // TODO 카테고리별 메뉴판 관리
@@ -53,24 +56,25 @@ function App() {
 		this.menu.push({ name: espressoMenuName });
 		store.setLocalStorage(this.menu);
 		const template = this.menu
-			.map((item) => {
+			.map((menuItem, index) => {
 				return `
-				<li class="menu-list-item d-flex items-center py-2">
-					<span class="w-100 pl-2 menu-name">${item.menu}</span>
-					<button
-						type="button" class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
-					>
-						수정
-					</button>
-					<button
-						type="button"
-						class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
-					>
-						삭제
-					</button>
-				</li>`;
+			<li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
+				<span class="w-100 pl-2 menu-name">${menuItem.name}</span>
+				<button
+					type="button" class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
+				>
+					수정
+				</button>
+				<button
+					type="button"
+					class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
+				>
+					삭제
+				</button>
+			</li>`;
 			})
 			.join("");
+
 		// map method를 통해 메뉴를 순회하면서 html 화면 넣는 마크업을 한다. 순회하면서 리턴한 값을 새로운 배열로 만들어준다.
 		// ["<li>~</<li>", "<li>~</<li>"]와 같은 형태로 반복적으로 출력 -> template 생성;
 
@@ -80,9 +84,12 @@ function App() {
 	};
 
 	const updateMenuName = (e) => {
+		const menuId = e.target.closest("li").dataset.menuId;
 		const $menuName = e.target.closest("li").querySelector(".menu-name");
 		// e.target 중 가장 가까운 li 찾음. 이너텍스트로 텍스트 가져오기
 		const updatedMenuName = prompt("메뉴명을 수정하세요", $menuName.innerText); // 인자 사용 유의하기
+		this.menu[menuId].name = updatedMenuName;
+		store.setLocalStorage(this.menu);
 		$menuName.innerText = updatedMenuName; //e를 변수로 활용
 	};
 
