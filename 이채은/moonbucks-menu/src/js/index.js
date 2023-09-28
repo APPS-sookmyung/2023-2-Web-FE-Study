@@ -62,21 +62,29 @@ function App() {
       .map((item, index) => {
         //html 태그 중 배열의 원소에 유일한 값을 부여하고 싶을 때 = id(data) 를 사용  => data- ~ 라고 id 주기
         return `
-          <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
-            <span class="w-100 pl-2 menu-name">${item.name}</span>
-            <button
-              type="button"
-              class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
-            >
-              수정
-            </button>
-            <button
-              type="button"
-              class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
-            >
-              삭제
-            </button>
-          </li>`;
+        <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
+          <span class="w-100 pl-2 menu-name ${
+            item.soldOut ? "sold-out" : ""
+          }">${item.name}</span>
+          <button
+            type="button"
+            class="bg-gray-50 text-gray-500 text-sm mr-1 menu-sold-out-button"
+          >
+            품절
+          </button>
+          <button
+            type="button"
+            class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
+          >
+            수정
+          </button>
+          <button
+            type="button"
+            class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
+          >
+            삭제
+          </button>
+        </li>`;
       })
       .join("");
 
@@ -124,14 +132,29 @@ function App() {
     }
   };
 
+  const soldOutMenu = (e) => {
+    const menuId = e.target.closest("li").dataset.menuId;
+    this.menu[this.currentCategory][menuId].soldOut =
+      !this.menu[this.currentCategory][menuId].soldOut;
+    store.setLocalStorage(this.menu);
+    render();
+  };
+
   $("#menu-list").addEventListener("click", (e) => {
     //if 로 올바른(수정) 버튼인지 ( class 로 구분 )
     if (e.target.classList.contains("menu-edit-button")) {
       updateMenuName(e); //리팩터링
+      return; // 불필요한 밑부분의 if 문은 실행하지 않도록 만들어줌
     }
 
     if (e.target.classList.contains("menu-remove-button")) {
       removeMenuName(e); //리팩터링
+      return;
+    }
+
+    if (e.target.classList.contains("menu-sold-out-button")) {
+      soldOutMenu(e);
+      return;
     }
   });
 
