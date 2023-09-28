@@ -34,18 +34,31 @@ const store = {
 function App() {
   // 상태: 변할 수 있는 데이터=> 변하기 떄문에 관리를 해줘야 한다. (변할 수 있는 거: 메뉴명- 메뉴명의 길이만 가지고 오면 갯수 구할 수 있으니까 메뉴명만 관리하기)
 
-  this.menu = []; // 상태값 변화가 있는 부분에만 this. 메서드를 사용
+  this.menu = {
+    // 각 카테고리 별로 나눠서 메뉴 관리를 할 수 있음
+    espresso: [],
+    frappuccino: [],
+    blended: [],
+    teavana: [],
+    dessert: [],
+  };
+
+  // 상태관리 ( 현재상태를 알아야 하는 부분들 관리 : 나중에 변경될 수 있기 때문에 알아야 함. ) , 최초는 espresso
+  this.currentCategory = "espresso";
+
+  // 상태값 변화가 있는 부분에만 this. 메서드를 사용
 
   this.init = () => {
     // app 이라는 function 이 랜더링 될때 실행하는 메서드 ( )
-    if (store.getLocalStorage().length > 1) {
+    if (store.getLocalStorage()) {
+      // 로컬 스토리지에 데이터가 있으면 보여주기
       this.menu = store.getLocalStorage();
     }
     render();
   };
 
   const render = () => {
-    const template = this.menu
+    const template = this.menu[this.currentCategory]
       .map((item, index) => {
         //html 태그 중 배열의 원소에 유일한 값을 부여하고 싶을 때 = id(data) 를 사용  => data- ~ 라고 id 주기
         return `
@@ -85,7 +98,7 @@ function App() {
       return;
     }
     const espressoMenuName = $("#espresso-menu-name").value;
-    this.menu.push({ name: espressoMenuName });
+    this.menu[this.currentCategory].push({ name: espressoMenuName });
     store.setLocalStorage(this.menu);
     render();
     $("#espresso-menu-name").value = "";
@@ -138,6 +151,16 @@ function App() {
       return;
     }
     addMenuName();
+  });
+
+  //메뉴판 관리하기
+  $("nav").addEventListener("click", (e) => {
+    // button 마다 이벤트를 모두 다는 것은 비효율적임.
+    const isCategoryButton = e.target.classList.contains("cafe-category-name");
+    if (isCategoryButton) {
+      // 예외처리 : nav 바 아무데나 클릭하면 이벤트 발생하는 것을 방지하기 위해 작성
+      const categoryName = e.target.dataset.categoryName; // html 에서 이미 id 를 data- 형태로 줬기 때문에, dataset 이라는 메서드를 사용해서 접근하기.
+    }
   });
 }
 
