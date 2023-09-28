@@ -71,25 +71,25 @@ function App() {
 			})
 			.join("");
 
-		$("#espresso-menu-list").innerHTML = template;
+		$("#menu-list").innerHTML = template;
 		updateMenuCount();
 	};
 
 	const updateMenuCount = () => {
-		const menuCount = $("#espresso-menu-list").querySelectorAll("li").length;
+		const menuCount = $("#menu-list").querySelectorAll("li").length;
 		$(".menu-count").innerText = `총 ${menuCount} 개`;
 	};
 
 	const addMenuName = () => {
-		if ($("#espresso-menu-name").value === "") {
+		if ($("#emenu-name").value === "") {
 			alert("값을 입력해주세요.");
 			return;
 		}
-		const espressoMenuName = $("#espresso-menu-name").value;
-		this.menu[this.currentCategory].push({ name: espressoMenuName });
+		const MenuName = $("#menu-name").value;
+		this.menu[this.currentCategory].push({ name: MenuName });
 		store.setLocalStorage(this.menu);
 		render();
-		$("#espresso-menu-name").value = "";
+		$("#menu-name").value = "";
 	};
 
 	const updateMenuName = (e) => {
@@ -104,14 +104,14 @@ function App() {
 	const removeMenuName = (e) => {
 		if (confirm("정말 삭제하시겠습니까?")) {
 			const menuId = e.target.closest("li").dataset.menuId;
-			this.menu.splice(menuId, 1);
+			this.menu[this.currentCategory].splice(menuId, 1);
 			store.setLocalStorage(this.menu);
 			e.target.closest("li").remove();
 			updateMenuCount(e);
 		}
 	};
 
-	$("#espresso-menu-list").addEventListener("click", (e) => {
+	$("#menu-list").addEventListener("click", (e) => {
 		//if 로 올바른(수정) 버튼인지 ( class 로 구분 )
 		if (e.target.classList.contains("menu-edit-button")) {
 			updateMenuName(e); //리팩터링
@@ -123,14 +123,14 @@ function App() {
 	});
 
 	//form태그가 자동으로 전송되는걸 막아준다.
-	$("#espresso-menu-form").addEventListener("submit", (e) => {
+	$("#menu-form").addEventListener("submit", (e) => {
 		e.preventDefault();
 	});
 
-	$("#espresso-menu-submit-button").addEventListener("click", addMenuName);
+	$("#menu-submit-button").addEventListener("click", addMenuName);
 
 	// 메뉴의 이름을 입력받는건
-	$("#espresso-menu-name").addEventListener("keypress", (e) => {
+	$("#menu-name").addEventListener("keypress", (e) => {
 		if (e.key !== "Enter") {
 			// 처음에 엔터를 눌러도 alert 안뜨게
 			return;
@@ -142,7 +142,9 @@ function App() {
 		const isCategoryButton = e.target.classList.contains("cafe-category-name");
 		if (isCategoryButton) {
 			const categoryName = e.target.dataset.categoryName;
-			console.log(categoryName);
+			this.currentCategory = categoryName;
+			$("#category-title").innerText = `${e.target.innerText} 메뉴관리`;
+			render();
 		}
 	});
 }
