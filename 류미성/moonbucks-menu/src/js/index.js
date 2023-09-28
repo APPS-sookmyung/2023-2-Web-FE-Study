@@ -22,8 +22,6 @@
 // - [] 품절 해당 메뉴의 상태값이 페이지에 그려진다.
 //  -[] 클릭이벤트에서 가장 가까운 li태그의 class속성 값에 sold-out을 추가한다.
 
-// -> 요구사항을 상세하게 분석하고, 어떤것을 구현해야 되는지를 정리하면서 눈으로 확인하기
-
 const $ = (selector) => document.querySelector(selector);
 
 const store = {
@@ -36,35 +34,40 @@ const store = {
 };
 
 function App() {
-	// 상태는 변하는 데이터, 이 앱에서 변하는 것이 무엇인가 - 메뉴명 (갯수 X)
-	// 메뉴명이 배열이 담겨있고, 배열의 길이를 알면 갯수를 알 수 있음. (-> 갯수는 업데이트만 하고 저장하지 않아도 되는 대상).
-	// 최소한의 데이터만 관리리해야할 데이터가 무엇인지 항상 고민하기. 안그러면 코드가 복잡해질 수 있음 따라서 메뉴명만 관리하기
-	this.menu = [];
+	this.menu = {
+		espresso: [],
+		frappuccino: [],
+		blended: [],
+		teavana: [],
+		desert: [],
+	};
+	this.currentCategory = "espresso";
+
 	this.init = () => {
-		if (store.getLocalStorage().length >= 1) {
+		if (store.getLocalStorage()) {
 			this.menu = store.getLocalStorage();
 		}
 		render();
 	};
 
 	const render = () => {
-		const template = this.menu
+		const template = this.menu[this.currentCategory]
 			.map((menuItem, index) => {
 				return `
-				<li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
-					<span class="w-100 pl-2 menu-name">${menuItem.name}</span>
-					<button
-						type="button" class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
-					>
-						수정
-					</button>
-					<button
-						type="button"
-						class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
-					>
-						삭제
-					</button>
-				</li>`;
+			<li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
+				<span class="w-100 pl-2 menu-name">${menuItem.name}</span>
+				<button
+					type="button" class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
+				>
+					수정
+				</button>
+				<button
+					type="button"
+					class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
+				>
+					삭제
+				</button>
+			</li>`;
 			})
 			.join("");
 
@@ -77,28 +80,23 @@ function App() {
 		$(".menu-count").innerText = `총 ${menuCount} 개`;
 	};
 
-	//재사용하는 부분을 한곳에 모아줌
 	const addMenuName = () => {
 		if ($("#espresso-menu-name").value === "") {
 			alert("값을 입력해주세요.");
 			return;
 		}
 		const espressoMenuName = $("#espresso-menu-name").value;
-		this.menu.push({ name: espressoMenuName });
+		this.menu[this.currentCategory].push({ name: espressoMenuName });
 		store.setLocalStorage(this.menu);
 		render();
 		$("#espresso-menu-name").value = "";
-
-		// map method를 통해 메뉴를 순회하면서 html 화면 넣는 마크업을 한다. 순회하면서 리턴한 값을 새로운 배열로 만들어준다.
-		// ["<li>~</<li>", "<li>~</<li>"]와 같은 형태로 반복적으로 출력 -> template 생성;
 	};
 
 	const updateMenuName = (e) => {
 		const menuId = e.target.closest("li").dataset.menuId;
 		const $menuName = e.target.closest("li").querySelector(".menu-name");
-		// e.target 중 가장 가까운 li 찾음. 이너텍스트로 텍스트 가져오기
 		const updatedMenuName = prompt("메뉴명을 수정하세요", $menuName.innerText); // 인자 사용 유의하기
-		this.menu[menuId].name = updatedMenuName;
+		this.menu[this.currentCategory][menuId].name = updatedMenuName;
 		store.setLocalStorage(this.menu);
 		$menuName.innerText = updatedMenuName; //e를 변수로 활용
 	};
@@ -139,7 +137,14 @@ function App() {
 		}
 		addMenuName();
 	});
-}
 
+	$("nav").addEventListener("click", (e) => {
+		const isCategoryButton = e.target.classList.contains("cafe-category-name");
+		if (isCategoryButton) {
+			const categoryName = e.target.dataset.categoryName;
+			console.log(categoryName);
+		}
+	});
+}
 const app = new App();
 app.init();
