@@ -1,7 +1,43 @@
+// TODO localStorage Read & Write
+// - [] localStorage에 데이터를 저장한다.
+// - [] localStorage에 있는 데이터를 읽어온다.
+
+// TODO 카테고리별 메뉴판 관리
+// - [] 에스프레소 메뉴판 관리
+// - [] 프라푸치노 메뉴판 관리
+// - [] 블렌디드 메뉴판 관리
+// - [] 티바나 메뉴판 관리
+// - [] 디저트 메뉴판 관리
+
+// TODO 페이지 접근시 최초 데이터 Read&Rendering
+// - [] 페이지에 최초로 접근할 때는 localStorage에서 에스프레소 메뉴를 읽어온다.
+// - [] 에스프레소 메뉴를 페이지에 그려준다.
+//
+// - [] 품절 상태인 경우를 보여줄 수 있게, 품절 버튼을 추가하고 sold-out class를 추가하여 상태를 변경한다.
+// - [] 품절 버튼을 추가한다
+// - [] 품절 버튼을 클릭하면 localStorage에 상태값이 저장된다
+// - [] 품절 해당 메뉴의 상태값이 페이지에 그려진다.
+//  -[] 클릭이벤트에서 가장 가까운 li태그의 class속성 값에 sold-out을 추가한다.
+
+// -> 요구사항을 상세하게 분석하고, 어떤것을 구현해야 되는지를 정리하면서 눈으로 확인하기
+
 const $ = (selector) => document.querySelector(selector);
 
+const store = {
+	setLocalStorage(menu) {
+		localStorage.setItem("menu", JSON.stringify(menu));
+	},
+	getLocalStorage() {
+		localStorage.getItem("menu");
+	},
+};
+
 function App() {
-	//수정버튼 구현 (위로 위임하는 기능) => 모달창 ( promt 로 구현 )
+	// 상태는 변하는 데이터, 이 앱에서 변하는 것이 무엇인가 - 메뉴명 (갯수 X)
+	// 메뉴명이 배열이 담겨있고, 배열의 길이를 알면 갯수를 알 수 있음. (-> 갯수는 업데이트만 하고 저장하지 않아도 되는 대상).
+	// 최소한의 데이터만 관리리해야할 데이터가 무엇인지 항상 고민하기. 안그러면 코드가 복잡해질 수 있음 따라서 메뉴명만 관리하기
+	this.menu = [];
+
 	const updateMenuCount = () => {
 		const menuCount = $("#espresso-menu-list").querySelectorAll("li").length;
 		$(".menu-count").innerText = `총 ${menuCount} 개`;
@@ -11,30 +47,35 @@ function App() {
 	const addMenuName = () => {
 		if ($("#espresso-menu-name").value === "") {
 			alert("값을 입력해주세요.");
-			return; // 뒷부분(엔터가 실행되지 않도록)
+			return;
 		}
 		const espressoMenuName = $("#espresso-menu-name").value;
-		const menuItemTemplate = (espressoMenuName) => {
-			return `
-        <li class="menu-list-item d-flex items-center py-2">
-        <span class="w-100 pl-2 menu-name">${espressoMenuName}</span>
-        <button
-          type="button"
-          class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
-        >
-          수정
-        </button>
-        <button
-          type="button"
-          class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
-        >
-          삭제
-        </button>
-        </li>`;
-		};
-		$("#espresso-menu-list").insertAdjacentHTML("beforeend", menuItemTemplate(espressoMenuName));
-		const menuCount = $("#espresso-menu-list").querySelectorAll("li").length;
-		$(".menu-count").innerText = `총 ${menuCount} 개`;
+		this.menu.push({ name: espressoMenuName });
+		store.setLocalStorage(this.menu);
+		const template = this.menu
+			.map((item) => {
+				return `
+				<li class="menu-list-item d-flex items-center py-2">
+					<span class="w-100 pl-2 menu-name">${item.menu}</span>
+					<button
+						type="button" class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
+					>
+						수정
+					</button>
+					<button
+						type="button"
+						class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
+					>
+						삭제
+					</button>
+				</li>`;
+			})
+			.join("");
+		// map method를 통해 메뉴를 순회하면서 html 화면 넣는 마크업을 한다. 순회하면서 리턴한 값을 새로운 배열로 만들어준다.
+		// ["<li>~</<li>", "<li>~</<li>"]와 같은 형태로 반복적으로 출력 -> template 생성;
+
+		$("#espresso-menu-list").innerHTML = template;
+		updateMenuCount();
 		$("#espresso-menu-name").value = "";
 	};
 
@@ -80,4 +121,4 @@ function App() {
 	});
 }
 
-App();
+const app = new App();
