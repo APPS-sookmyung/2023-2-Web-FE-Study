@@ -1,6 +1,6 @@
 // TODO localStorage Read -& Write
-// - [] localStorage에 데이터를 저장한다.
-// - [] 저장한 데이터를 읽어온다.
+// - [v] localStorage에 데이터를 저장한다.
+// - [v] 저장한 데이터를 읽어온다.
 
 // TODO 카테고리별 메뉴판 관리
 // - [] 에스프레소 메뉴판 관리
@@ -27,7 +27,7 @@ const store = {
     localStorage.setItem("menu", JSON.stringify(menu)); // 로컬 스토리지는 문자열로만 저장할 수 있음. 따라서 JSON 객체변환 메서드 사용하기
   },
   getLocalStorage() {
-    localStorage.getItem("menu");
+    return JSON.parse(localStorage.getItem("menu"));
   },
 };
 
@@ -36,23 +36,15 @@ function App() {
 
   this.menu = []; // 상태값 변화가 있는 부분에만 this. 메서드를 사용
 
-  const updateMenuCount = () => {
-    const updateMenuCount = $("#espresso-menu-list").querySelectorAll(
-      "li"
-    ).length;
-    $(".menu-count").innerText = `총 ${updateMenuCount} 개`;
+  this.init = () => {
+    // app 이라는 function 이 랜더링 될때 실행하는 메서드 ( )
+    if (store.getLocalStorage().length > 1) {
+      this.menu = store.getLocalStorage();
+    }
+    render();
   };
 
-  //재사용하는 부분을 한곳에 모아줌
-  const addMenuName = () => {
-    if ($("#espresso-menu-name").value === "") {
-      alert("값을 입력해주세요.");
-      return;
-    }
-    const espressoMenuName = $("#espresso-menu-name").value;
-    this.menu.push({ name: espressoMenuName });
-    store.setLocalStorage(this.menu);
-
+  const render = () => {
     const template = this.menu
       .map((item, index) => {
         //html 태그 중 배열의 원소에 유일한 값을 부여하고 싶을 때 = id(data) 를 사용  => data- ~ 라고 id 주기
@@ -77,6 +69,25 @@ function App() {
 
     $("#espresso-menu-list").innerHTML = template; // Update the entire menu list
     updateMenuCount();
+  };
+
+  const updateMenuCount = () => {
+    const updateMenuCount = $("#espresso-menu-list").querySelectorAll(
+      "li"
+    ).length;
+    $(".menu-count").innerText = `총 ${updateMenuCount} 개`;
+  };
+
+  //재사용하는 부분을 한곳에 모아줌
+  const addMenuName = () => {
+    if ($("#espresso-menu-name").value === "") {
+      alert("값을 입력해주세요.");
+      return;
+    }
+    const espressoMenuName = $("#espresso-menu-name").value;
+    this.menu.push({ name: espressoMenuName });
+    store.setLocalStorage(this.menu);
+    render();
     $("#espresso-menu-name").value = "";
   };
 
@@ -131,3 +142,4 @@ function App() {
 }
 
 const app = new App();
+app.init();
