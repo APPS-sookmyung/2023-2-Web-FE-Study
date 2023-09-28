@@ -1,9 +1,9 @@
 // TODO localStorage Read & Write
-// - [] localStorage에 데이터를 저장한다.
+// - [x] localStorage에 데이터를 저장한다.
 // - [x] 메뉴를 추가할 때
-// - [] 메뉴를 수정할 때
-// - [] 메뉴를 삭제할 때
-// - [] localStorage에 있는 데이터를 읽어온다.
+// - [x] 메뉴를 수정할 때
+// - [x] 메뉴를 삭제할 때
+// - [x] localStorage에 있는 데이터를 읽어온다.
 
 // TODO 카테고리별 메뉴판 관리
 // - [] 에스프레소 메뉴판 관리
@@ -31,7 +31,7 @@ const store = {
 		localStorage.setItem("menu", JSON.stringify(menu));
 	},
 	getLocalStorage() {
-		localStorage.getItem("menu");
+		return JSON.parse(localStorage.getItem("menu"));
 	},
 };
 
@@ -40,6 +40,37 @@ function App() {
 	// 메뉴명이 배열이 담겨있고, 배열의 길이를 알면 갯수를 알 수 있음. (-> 갯수는 업데이트만 하고 저장하지 않아도 되는 대상).
 	// 최소한의 데이터만 관리리해야할 데이터가 무엇인지 항상 고민하기. 안그러면 코드가 복잡해질 수 있음 따라서 메뉴명만 관리하기
 	this.menu = [];
+	this.init = () => {
+		if (store.getLocalStorage().length >= 1) {
+			this.menu = store.getLocalStorage();
+		}
+		render();
+	};
+
+	const render = () => {
+		const template = this.menu
+			.map((menuItem, index) => {
+				return `
+				<li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
+					<span class="w-100 pl-2 menu-name">${menuItem.name}</span>
+					<button
+						type="button" class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
+					>
+						수정
+					</button>
+					<button
+						type="button"
+						class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
+					>
+						삭제
+					</button>
+				</li>`;
+			})
+			.join("");
+
+		$("#espresso-menu-list").innerHTML = template;
+		updateMenuCount();
+	};
 
 	const updateMenuCount = () => {
 		const menuCount = $("#espresso-menu-list").querySelectorAll("li").length;
@@ -55,32 +86,11 @@ function App() {
 		const espressoMenuName = $("#espresso-menu-name").value;
 		this.menu.push({ name: espressoMenuName });
 		store.setLocalStorage(this.menu);
-		const template = this.menu
-			.map((menuItem, index) => {
-				return `
-			<li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
-				<span class="w-100 pl-2 menu-name">${menuItem.name}</span>
-				<button
-					type="button" class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
-				>
-					수정
-				</button>
-				<button
-					type="button"
-					class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
-				>
-					삭제
-				</button>
-			</li>`;
-			})
-			.join("");
+		render();
+		$("#espresso-menu-name").value = "";
 
 		// map method를 통해 메뉴를 순회하면서 html 화면 넣는 마크업을 한다. 순회하면서 리턴한 값을 새로운 배열로 만들어준다.
 		// ["<li>~</<li>", "<li>~</<li>"]와 같은 형태로 반복적으로 출력 -> template 생성;
-
-		$("#espresso-menu-list").innerHTML = template;
-		updateMenuCount();
-		$("#espresso-menu-name").value = "";
 	};
 
 	const updateMenuName = (e) => {
@@ -132,3 +142,4 @@ function App() {
 }
 
 const app = new App();
+app.init();
