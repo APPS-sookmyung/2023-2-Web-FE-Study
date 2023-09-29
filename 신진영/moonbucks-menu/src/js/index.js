@@ -1,14 +1,14 @@
 // Step1 요구사항 구현
 // TODO 메뉴 추가
 // [ ] 에스프레소 메뉴에 새로운 메뉴를 확인 버튼 또는 엔터키 입력으로 추가한다.
+// [X] 추가되는 메뉴의 아래 마크업은 <ul id="espresso-menu-list" class="mt-3 pl-0"></ul> 안에 삽입해야 한다.
+// [ ] 총 메뉴 갯수를 count하여 상단에 보여준다.
 // [ ] 메뉴가 추가되고 나면, input은 빈 값으로 초기화한다.
 // [ ] 사용자 입력값이 빈 값이라면 추가되지 않는다.
 // [ ] 메뉴의 수정 버튼을 눌러 메뉴 이름 수정할 수 있다.
 // [ ] 메뉴 수정시 브라우저에서 제공하는 prompt 인터페이스를 활용한다.
 // [ ] 메뉴 삭제 버튼을 이용하여 메뉴 삭제할 수 있다.
 // [ ] 메뉴 삭제시 브라우저에서 제공하는 confirm 인터페이스를 활용한다.
-// [ ] 총 메뉴 갯수를 count하여 상단에 보여준다.
-// 추가되는 메뉴의 아래 마크업은 <ul id="espresso-menu-list" class="mt-3 pl-0"></ul> 안에 삽입해야 한다.
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -43,6 +43,9 @@ function App() {
         'beforeend',
         menuItemTemplate(espressoMenuName)
       );
+      // 총 메뉴 개수 구하기 -> li 개수 count
+      const menuCount = $('#espresso-menu-list').querySelectorAll('li').length;
+      $('.menu-count').innerText = `총 ${menuCount}개`;
     }
   });
 }
@@ -54,4 +57,7 @@ App();
 // form 태그로 인해 화면이 자동 새로고침 됨(자동으로 전송되기 때문)
 // util같은 함수 만들기; js에서 html element를 가져올 때 관용적으로 "$"를 많이 사용함
 // 추가되는 메뉴는 매번 똑같은 형식의 마크업으로 추가되는거니까 제공된 코드를 템플릿 변수에 함수로 담아서 사용할건데, 이름은 menuItemTemplate으로 지었음. 메뉴'하나'추가니까 Item !!
-// insertadjacenthtml() 메서드 이용
+// insertadjacenthtml() 메서드 이용해서 html태그 추가
+// innerText 이용해서 태그 안의 텍스트 변경
+// 변수명 menuCount <- 클래스명 menu-count 활용해서 짓기
+// querySelector("li")는 첫번째 li태그만 가져옴. 필요시 querySelectorAll 사용하기
