@@ -2,9 +2,10 @@
 // TODO 메뉴 추가
 // [ ] 에스프레소 메뉴에 새로운 메뉴를 확인 버튼 또는 엔터키 입력으로 추가한다.
 // [X] 추가되는 메뉴의 아래 마크업은 <ul id="espresso-menu-list" class="mt-3 pl-0"></ul> 안에 삽입해야 한다.
-// [ ] 총 메뉴 갯수를 count하여 상단에 보여준다.
-// [ ] 메뉴가 추가되고 나면, input은 빈 값으로 초기화한다.
-// [ ] 사용자 입력값이 빈 값이라면 추가되지 않는다.
+// [X] 총 메뉴 갯수를 count하여 상단에 보여준다.
+// [X] 메뉴가 추가되고 나면, input은 빈 값으로 초기화한다.
+// [X] 사용자 입력값이 빈 값이라면 추가되지 않는다.
+
 // [ ] 메뉴의 수정 버튼을 눌러 메뉴 이름 수정할 수 있다.
 // [ ] 메뉴 수정시 브라우저에서 제공하는 prompt 인터페이스를 활용한다.
 // [ ] 메뉴 삭제 버튼을 이용하여 메뉴 삭제할 수 있다.
@@ -19,11 +20,15 @@ function App() {
   });
   // 사용자료부터 메뉴 이름을 입력받기
   $('#espresso-menu-name').addEventListener('keypress', (e) => {
-    console.log(e.key);
-    if (e.key === 'Enter') {
-      const espressoMenuName = $('#espresso-menu-name').value;
-      const menuItemTemplate = (espressoMenuName) => {
-        return `<li class="menu-list-item d-flex items-center py-2">
+    if (e.key !== 'Enter') return;
+    if ($('#espresso-menu-name').value === '') {
+      alert('메뉴 이름을 입력해주세요.');
+      return;
+    }
+
+    const espressoMenuName = $('#espresso-menu-name').value;
+    const menuItemTemplate = (espressoMenuName) => {
+      return `<li class="menu-list-item d-flex items-center py-2">
         <span class="w-100 pl-2 menu-name">${espressoMenuName}</span>
         <button
           type="button"
@@ -38,15 +43,15 @@ function App() {
           삭제
         </button>
       </li>`;
-      };
-      $('#espresso-menu-list').insertAdjacentHTML(
-        'beforeend',
-        menuItemTemplate(espressoMenuName)
-      );
-      // 총 메뉴 개수 구하기 -> li 개수 count
-      const menuCount = $('#espresso-menu-list').querySelectorAll('li').length;
-      $('.menu-count').innerText = `총 ${menuCount}개`;
-    }
+    };
+    $('#espresso-menu-list').insertAdjacentHTML(
+      'beforeend',
+      menuItemTemplate(espressoMenuName)
+    );
+    // 총 메뉴 개수 구하기 -> li 개수 count
+    const menuCount = $('#espresso-menu-list').querySelectorAll('li').length;
+    $('.menu-count').innerText = `총 ${menuCount}개`;
+    $('#espresso-menu-name').value = '';
   });
 }
 
@@ -61,3 +66,4 @@ App();
 // innerText 이용해서 태그 안의 텍스트 변경
 // 변수명 menuCount <- 클래스명 menu-count 활용해서 짓기
 // querySelector("li")는 첫번째 li태그만 가져옴. 필요시 querySelectorAll 사용하기
+// 메뉴 추가시, 처음 공백상태에서 alert창이 뜨는 것을 막기 위해, 일단 enter키가 아닐 때에는 return해버리고, enter키가 눌렸을때 그것이 빈 칸인지 아닌지를 검사한다.
