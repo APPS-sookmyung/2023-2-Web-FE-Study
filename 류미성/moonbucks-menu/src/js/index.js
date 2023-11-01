@@ -22,8 +22,28 @@
 // - [] 품절 해당 메뉴의 상태값이 페이지에 그려진다.
 //  -[] 클릭이벤트에서 가장 가까운 li태그의 class속성 값에 sold-out을 추가한다.
 
+// TODO 서버 요청 부분
+// [] 웹 서버를 띄운다
+// [] 서버의 새로운 메뉴명이 추가될 수 있도록 요청한다 ( api 당 하나의 카테고리로 해서 서버에 요청하도록 )
+// [] 서버에 카테고리별 메뉴리스트를 불러온다.
+// [] 서버에 메뉴가 수정 될 수 있도록 요청한다.
+// [] 서버에 메뉴의 품절상태를 토글될 수 있도록 요청한다.
+// [] 서버에 메뉴가 삭제될 수 있도록 요청한다
+//
+// TODO 리팩터링 부분
+// [] localStorage에 저장되는 로직은 지운다
+// [] fetch 비동기 api를 사용하는 부분을 async await을 사용하여 구현한다.
+
+// TODO 사용자 경험
+// [] API 통신이 실패하는 경우에 대해 사용자
+// [] 중복되는 메뉴는 추가할 수 있다.
+
 import { $ } from "./utils/dom.js";
 import store from "./store/index.js";
+
+const BASE_URL = "http://localhost:3000/api";
+
+// fetch('url', option)
 
 function App() {
 	this.menu = {
@@ -84,7 +104,21 @@ function App() {
 			return;
 		}
 		const MenuName = $("#menu-name").value;
-		this.menu[this.currentCategory].push({ name: MenuName });
+
+		fetch(`${BASE_URL}/category/${this.currentCategory}/menu`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ name: menuName }),
+		})
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				console.log(data);
+			});
+		// this.menu[this.currentCategory].push({ name: MenuName });
 		store.setLocalStorage(this.menu);
 		render();
 		$("#menu-name").value = "";
