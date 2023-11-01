@@ -1,26 +1,23 @@
-// TODO localStorage Read -& Write
-// - [v] localStorage에 데이터를 저장한다.
-// - [v] 저장한 데이터를 읽어온다.
+// 서비스 관련
+// d] 웹 서버를 띄운다
+// [] 서버의 새로운 메뉴명이 추가될 수 있도록 요청한다 ( api 당 하나의 카테고리로 해서 서버에 요청하도록 )
+// [] 서버에 카테고리별 메뉴리스트를 불러온다
+// [] 서버에 메뉴를 수정될 수 있도록 요청한다.
+// [] 서버 메뉴의 품질상태가 토글될 수 있도록 요청한다
+// [] 서버의 메뉴가 삭제될 수 있도록 요청한다
 
-// TODO 카테고리별 메뉴판 관리
-// - [v] 에스프레소 메뉴판 관리
-// - [v] 프라푸치노 메뉴판 관리
-// - [v] 블렌디드 메뉴판 관리
-// - [v] 티바나 메뉴판 관리
-// - [v] 디저트 메뉴판 관리
+// 리팩터링 관련
+// [] localStorage에 저장되는 로직은 지운다
+// [] fetch 비동기 api를 사용하는 부분을 async await을 사용하여 구현한다.
 
-// TODO 페이지 접근시 최초 데이터 Read & Rendering
-// - [v] 페이지에 최초로 로딩될때 localstorage의 에스프레소 메뉴를 읽어온다.
-// - [v] 에스프레소 메뉴를 페이지에 그려준다.
-
-// TODO 품질상태 관리
-// - [v] 품절 상태인 경우를 보여줄 수 있게, 품절 버튼을 추가하고 sold-out class를 추가하여 상태를 변경한다.
-// - [v] 품절 상태 메뉴의 마크업
-// - [v] 품절 버튼을 클릭하면 localStorage 에 상태값을 저장된다.
-// - [v] 클릭 이벤트에서 가장 가까운 li 태그의 class 속성 값에 sold-out 을 추가한다
+//사용자 경험
+// [] API 통신이 실패하는 경우에 대해 사용자가 알 수 있게 alert으로 예외처리를 진행한다.
+// [] 중복되는 메뉴는 추가할 수 없다.
 
 import { $ } from "./utils/dom.js";
 import store from "./store/index.js";
+
+const BASE_URL = "http://localhost:3000/api";
 
 function App() {
   // 상태: 변할 수 있는 데이터=> 변하기 떄문에 관리를 해줘야 한다. (변할 수 있는 거: 메뉴명- 메뉴명의 길이만 가지고 오면 갯수 구할 수 있으니까 메뉴명만 관리하기)
@@ -96,10 +93,26 @@ function App() {
       return;
     }
     const MenuName = $("#menu-name").value;
-    this.menu[this.currentCategory].push({ name: MenuName });
-    store.setLocalStorage(this.menu);
-    render();
-    $("#menu-name").value = "";
+
+    fetch(`${BASE_URL}/category/${this.currentCategory}/menu`, {
+      // 데이터 생성하는 요청
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name: MenuName }),
+    })
+      .then((responce) => {
+        //서버한테 데이터를 받을 때
+        return responce.json();
+      })
+      .then((data) => {
+        console.log(data);
+      });
+    // this.menu[this.currentCategory].push({ name: MenuName });
+    // store.setLocalStorage(this.menu);
+    // render();
+    // $("#menu-name").value = "";
   };
 
   const updateMenuName = (e) => {
