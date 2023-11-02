@@ -1,6 +1,6 @@
 // 서비스 관련
-// d] 웹 서버를 띄운다
-// [] 서버의 새로운 메뉴명이 추가될 수 있도록 요청한다 ( api 당 하나의 카테고리로 해서 서버에 요청하도록 )
+// [o] 웹 서버를 띄운다
+// [o] 서버의 새로운 메뉴명이 추가될 수 있도록 요청한다 ( api 당 하나의 카테고리로 해서 서버에 요청하도록 )
 // [] 서버에 카테고리별 메뉴리스트를 불러온다
 // [] 서버에 메뉴를 수정될 수 있도록 요청한다.
 // [] 서버 메뉴의 품질상태가 토글될 수 있도록 요청한다
@@ -19,11 +19,28 @@ import store from "./store/index.js";
 
 const BASE_URL = "http://localhost:3000/api";
 
-function App() {
-  // 상태: 변할 수 있는 데이터=> 변하기 떄문에 관리를 해줘야 한다. (변할 수 있는 거: 메뉴명- 메뉴명의 길이만 가지고 오면 갯수 구할 수 있으니까 메뉴명만 관리하기)
+const MenuApi = {
+  async getAllMenuByCategory(category) {
+    const response = await fetch(`${BASE_URL}/category/${category}/menu`);
+    return response.json();
+  },
+  async createMenu(category, name) {
+    const response = await fetch(`${BASE_URL}/category/${category}/menu`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name }),
+    });
 
+    if (!response.ok) {
+      console.error("API 오류");
+    }
+  },
+};
+
+function App() {
   this.menu = {
-    // 각 카테고리 별로 나눠서 메뉴 관리를 할 수 있음
     espresso: [],
     frappuccino: [],
     blended: [],
@@ -31,53 +48,47 @@ function App() {
     dessert: [],
   };
 
-  // 상태관리 ( 현재상태를 알아야 하는 부분들 관리 : 나중에 변경될 수 있기 때문에 알아야 함. ) , 최초는 espresso
   this.currentCategory = "espresso";
 
-  // 상태값 변화가 있는 부분에만 this. 메서드를 사용
-
-  this.init = () => {
-    // app 이라는 function 이 랜더링 될때 실행하는 메서드 ( )
-    if (store.getLocalStorage()) {
-      // 로컬 스토리지에 데이터가 있으면 보여주기
-      this.menu = store.getLocalStorage();
-    }
+  this.init = async () => {
+    this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+      this.currentCategory
+    );
     render();
-    this.initEventListeners();
+    initEventListeners();
   };
 
   const render = () => {
     const template = this.menu[this.currentCategory]
-      .map((item, index) => {
-        //html 태그 중 배열의 원소에 유일한 값을 부여하고 싶을 때 = id(data) 를 사용  => data- ~ 라고 id 주기
+      .map((menuItem, index) => {
         return `
-        <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
-          <span class="w-100 pl-2 menu-name ${
-            item.soldOut ? "sold-out" : ""
-          }">${item.name}</span>
-          <button
+      <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
+        <span class="w-100 pl-2 menu-name ${
+          menuItem.soldOut ? "sold-out" : ""
+        } ">${menuItem.name}</span>
+        <button
             type="button"
             class="bg-gray-50 text-gray-500 text-sm mr-1 menu-sold-out-button"
-          >
+        >
             품절
-          </button>
-          <button
-            type="button"
-            class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
-          >
-            수정
-          </button>
-          <button
-            type="button"
-            class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
-          >
-            삭제
-          </button>
-        </li>`;
+        </button>
+        <button
+          type="button"
+          class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
+        >
+          수정
+        </button>
+        <button
+          type="button"
+          class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
+        >
+          삭제
+        </button>
+      </li>`;
       })
       .join("");
 
-    $("#menu-list").innerHTML = template; // Update the entire menu list
+    $("#menu-list").innerHTML = template;
     updateMenuCount();
   };
 
@@ -86,33 +97,18 @@ function App() {
     $(".menu-count").innerText = `총 ${MenuCount} 개`;
   };
 
-  //재사용하는 부분을 한곳에 모아줌
-  const addMenuName = () => {
+  const addMenuName = async () => {
     if ($("#menu-name").value === "") {
       alert("값을 입력해주세요.");
       return;
     }
-    const MenuName = $("#menu-name").value;
-
-    fetch(`${BASE_URL}/category/${this.currentCategory}/menu`, {
-      // 데이터 생성하는 요청
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name: MenuName }),
-    })
-      .then((responce) => {
-        //서버한테 데이터를 받을 때
-        return responce.json();
-      })
-      .then((data) => {
-        console.log(data);
-      });
-    // this.menu[this.currentCategory].push({ name: MenuName });
-    // store.setLocalStorage(this.menu);
-    // render();
-    // $("#menu-name").value = "";
+    const menuName = $("#menu-name").value;
+    await MenuApi.createMenu(this.currentCategory, menuName);
+    this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+      this.currentCategory
+    );
+    render();
+    $("#menu-name").value = "";
   };
 
   const updateMenuName = (e) => {
@@ -180,20 +176,20 @@ function App() {
     });
 
     //메뉴판 관리하기
-    $("nav").addEventListener("click", (e) => {
-      // button 마다 이벤트를 모두 다는 것은 비효율적임.
+    $("nav").addEventListener("click", async (e) => {
       const isCategoryButton =
         e.target.classList.contains("cafe-category-name");
       if (isCategoryButton) {
-        // 예외처리 : nav 바 아무데나 클릭하면 이벤트 발생하는 것을 방지하기 위해 작성
-        const categoryName = e.target.dataset.categoryName; // html 에서 이미 id 를 data- 형태로 줬기 때문에, dataset 이라는 메서드를 사용해서 접근하기.
+        const categoryName = e.target.dataset.categoryName;
         this.currentCategory = categoryName;
-        $("#category-title").innerText = `${e.target.innerText} 메뉴관리 `;
+        $("#category-title").innerText = `${e.target.innerText} 메뉴관리`;
+        this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+          this.currentCategory
+        );
         render();
       }
     });
   };
 }
-
 const app = new App();
 app.init();
