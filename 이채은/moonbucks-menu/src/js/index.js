@@ -37,6 +37,47 @@ const MenuApi = {
       console.error("API 오류");
     }
   },
+
+  async updateMenu(category, name, menuId) {
+    const response = await fetch(
+      `${BASE_URL}/category/${category}/menu/${menuId}`,
+      {
+        method: "PUT", //수정할 때 PUT 을 사용한다
+        headers: {
+          "Content-Type": "application/json", // requestbody 가 있기 때문에 header 작성해야함
+        },
+        body: JSON.stringify({ name }),
+      }
+    );
+    if (!response.ok) {
+      console.error("에러발생");
+    }
+    return response.json();
+  },
+
+  async toggleSoldOutMenu(category, menuId) {
+    const response = await fetch(
+      `${BASE_URL}/category/${category}/menu/${menuId}/soldout`,
+      {
+        method: "PUT",
+      }
+    );
+    if (!response.ok) {
+      console.error("에러발생");
+    }
+  },
+
+  async deleteMenu(category, menuId) {
+    const response = await fetch(
+      `${BASE_URL}/category/${category}/menu/${menuId}/`,
+      {
+        method: "DELETE",
+      }
+    );
+    if (!response.ok) {
+      console.error("에러발생");
+    }
+  },
 };
 
 function App() {
@@ -62,9 +103,11 @@ function App() {
     const template = this.menu[this.currentCategory]
       .map((menuItem, index) => {
         return `
-      <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
+      <li data-menu-id="${
+        menuItem.id
+      }" class="menu-list-item d-flex items-center py-2">
         <span class="w-100 pl-2 menu-name ${
-          menuItem.soldOut ? "sold-out" : ""
+          menuItem.isSoldOut ? "sold-out" : ""
         } ">${menuItem.name}</span>
         <button
             type="button"
@@ -111,32 +154,37 @@ function App() {
     $("#menu-name").value = "";
   };
 
-  const updateMenuName = (e) => {
+  const updateMenuName = async (e) => {
     const menuId = e.target.closest("li").dataset.menuId; // element 객체의 ( dataset 메서드) 사용한다
     const $menuName = e.target.closest("li").querySelector(".menu-name");
     // e.target 중 가장 가까운 li 찾음. 이너텍스트로 텍스트 가져오기
     const updatedMenuName = prompt("메뉴명을 수정하세요", $menuName.innerText); // 인자 사용 유의하기
-
+    await MenuApi.updateMenu(this.currentCategory, updatedMenuName, menuId);
     //html 태그에 id 값을 줘보기 ( 상태 데이터의 유일한 값을 주기 위해 )
-    this.menu[this.currentCategory][menuId].name = updatedMenuName;
-    store.setLocalStorage(this.menu);
+    this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+      this.currentCategory
+    );
+
     render();
   };
 
-  const removeMenuName = (e) => {
+  const removeMenuName = async (e) => {
     if (confirm("정말 삭제하시겠습니까?")) {
       const menuId = e.target.closest("li").dataset.menuId;
-      this.menu[this.currentCategory].splice(menuId, 1); //배열의 특정 원소를 삭제하는 index  두번째 매개변수는 삭제할 개수 )
-      store.setLocalStorage(this.menu);
-      render(); // e.target.closest("li").remove(); 를 리팩토링
+      await MenuApi.deleteMenu(this.currentCategory, menuId); // 서버에서 삭제하는 부분
+      this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+        this.currentCategory
+      ); // 변경내용을 화면에 랜더링하는 부분
+      render();
     }
   };
 
-  const soldOutMenu = (e) => {
+  const soldOutMenu = async (e) => {
     const menuId = e.target.closest("li").dataset.menuId;
-    this.menu[this.currentCategory][menuId].soldOut =
-      !this.menu[this.currentCategory][menuId].soldOut;
-    store.setLocalStorage(this.menu);
+    await MenuApi.toggleSoldOutMenu(this.currentCategory, menuId);
+    this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+      this.currentCategory
+    );
     render();
   };
 
