@@ -24,7 +24,7 @@ TODO: 품절 관리
 ---
 ## 새로 깨달은 것   
 
-### * 몇 번째 요소인지 파악하기   
+### 1. 몇 번째 요소인지 파악하기   
 지금 하고 있는 birdieBuddy 프로젝트에 사용하는 "몇 번째 요소"의 방법은   
 ```javascript
 const thingToFindNumOf = e.target
@@ -35,8 +35,8 @@ const index = Array.prototype.indexOf.call(listToFindNumFrom, thingToFindNumOf);
 <br>  
 
 강의에서 배운 방식은 다음과 같다.   
-1. localStorage에 먼저 메뉴를 저장한다. 
-2. localStorage에 있는 녀석들을 
+a. localStorage에 먼저 메뉴를 저장한다.    
+b. localStorage에 있는 녀석들을 
 ```javascript
 const template = this.menu.map((item, index) =>{
     //data- :data 속성을 저장하고 싶을때의 표준 속성
@@ -49,7 +49,7 @@ $("#espresso-menu-list").innerHTML = template;
 해서 data-menu-id라는 custom attribtue를 부여해 준다.    
 https://velog.io/@gga01075/HTML%ED%83%9C%EA%B7%B8%EC%97%90-%EB%82%98%EB%A7%8C%EC%9D%98-%EC%BB%A4%EC%8A%A4%ED%85%80-%EC%86%8D%EC%84%B1-%EC%B6%94%EA%B0%80%ED%95%98%EA%B8%B0-ppec05qv  (custom attribute에 대하여)
 
-3. 나중에 localStorage의 특정 data에 접근하고 싶으면   
+c. 나중에 localStorage의 특정 data에 접근하고 싶으면   
 ```javascript
 const menuId = e.target.closest("li").dataset.menuId
 ```
@@ -66,17 +66,23 @@ this.menu[menuId].name = changedMenu;
 <br>
 <br>
 
-### * 최대한 한 파일에 객체의 개수는 최대한 적을수록 좋다.   
+### 2. 최대한 한 파일에 객체의 개수는 최대한 적을수록 좋다.   
 <br>
 
-### * utility 관련된 코드들은 (범용적- 범'파일'적) 따로 .js로 저장해 놓고 export하고 import하는 것이 좋다.
+### 3. utility 관련된 코드들은 (범용적- 범'파일'적) 따로 .js로 저장해 놓고 export하고 import하는 것이 좋다.   
+<br>
 
-### * if문이 여러개 있고, 하나를 완료하면 다른 것을 볼 필요 없을 시 return하는 습관을 들여라
+### 4. if문이 여러개 있고, 하나를 완료하면 다른 것을 볼 필요 없을 시 return하는 습관을 들여라   
+<br>
 
-### * bool에 따라 className을 넣을지 말지 정하기
+### 5. bool에 따라 className을 넣을지 말지 정하기
 ```html
 <span class="${item.soldOut ? "sold-out":""} w-100 pl-2 menu-name">${item.name}</span>
 ```
+<br>
+
+### 6. 여태껏 ```뒤에 javascript 썼는데 js써도 되네? (markdown)
+바보
 
 ---
 
@@ -195,10 +201,11 @@ https://www.udemy.com/course/vanilla-js-lv1/learn/lecture/28368074#questions/159
 1. 왜 localStorage로 다이렉트로 바꾸지 않는가? <- const store()를 만든 이유
 >데이터를 변경하는 역할은 최소한의 write하는 로직을 써야지  
 >안그러면 여기저기서 데이터가 변경되어서 상태가 꼬일 수 있다. 
->
 >한 함수에서 모든걸 하려면.... 한 함수의 역할이 많아져서 역할을 분리 해 준 것이다. 
 근데 솔직히 뭐니뭐니해도 그냥 코드가 길어서 함수로 정리한거 같다.   
 오히려 강사 설명이 더 헷갈렸다. 저 대답은 무슨 의미의 대답이었을까?   
+
+<br>
 
    
 2. 정의하지 않은 boolean object는 true로부터 시작하는가...?
@@ -207,4 +214,27 @@ this.menu[this.currentCategory][menuId].soldOut =
     !this.menu[this.currentCategory][menuId].soldOut;
 ```
 뭐.. 딱히 어디에 뭐시기뭐시기.soldOUt가 true부터 시작한다는 코드가 없는데도 잘 돌아간다.   
+<br>
 
+3. 왜 const app = new App();하면 this가 써지는걸까?
+https://www.udemy.com/course/vanilla-js-lv1/learn/lecture/28368074#questions/15938964
+
+>new 키워드를 사용하여 생성자 함수를 호출하게 되면 이때의 this는 "만들어질 객체"를 참조한다. 이걸 이론으로만 그냥 면접용으로 외웟는데 여기서 확인하게 되네요 ㅋㅋㅋ
+
+뭔 소릴꼬 싶어서 공부해봤더니   
+
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new
+
+아 맞다! js는 함수로 객체 만들 수 있었지!
+```js
+function Car(make, model, year) {
+  this.make = make;
+  this.model = model;
+  this.year = year;
+}
+
+const car1 = new Car('Eagle', 'Talon TSi', 1993);
+
+console.log(car1.make);
+// Expected output: "Eagle"
+```
