@@ -1,27 +1,3 @@
-// TODO localStorage Read & Write
-// - [x] localStorage에 데이터를 저장한다.
-// - [x] 메뉴를 추가할 때
-// - [x] 메뉴를 수정할 때
-// - [x] 메뉴를 삭제할 때
-// - [x] localStorage에 있는 데이터를 읽어온다.
-
-// TODO 카테고리별 메뉴판 관리
-// - [] 에스프레소 메뉴판 관리
-// - [] 프라푸치노 메뉴판 관리
-// - [] 블렌디드 메뉴판 관리
-// - [] 티바나 메뉴판 관리
-// - [] 디저트 메뉴판 관리
-
-// TODO 페이지 접근시 최초 데이터 Read&Rendering
-// - [] 페이지에 최초로 접근할 때는 localStorage에서 에스프레소 메뉴를 읽어온다.
-// - [] 에스프레소 메뉴를 페이지에 그려준다.
-//
-// - [] 품절 상태인 경우를 보여줄 수 있게, 품절 버튼을 추가하고 sold-out class를 추가하여 상태를 변경한다.
-// - [] 품절 버튼을 추가한다
-// - [] 품절 버튼을 클릭하면 localStorage에 상태값이 저장된다
-// - [] 품절 해당 메뉴의 상태값이 페이지에 그려진다.
-//  -[] 클릭이벤트에서 가장 가까운 li태그의 class속성 값에 sold-out을 추가한다.
-
 // TODO 서버 요청 부분
 // [] 웹 서버를 띄운다
 // [] 서버의 새로운 메뉴명이 추가될 수 있도록 요청한다 ( api 당 하나의 카테고리로 해서 서버에 요청하도록 )
@@ -42,7 +18,6 @@ import { $ } from "./utils/dom.js";
 import store from "./store/index.js";
 
 const BASE_URL = "http://localhost:3000/api";
-
 const MenuApi = {
 	async getAllMenuByCategory(category) {
 		const response = await fetch(`${BASE_URL}/category/${category}/menu`);
@@ -56,14 +31,43 @@ const MenuApi = {
 			},
 			body: JSON.stringify({ name }),
 		});
-
 		if (!response.ok) {
-			console.error("API 오류");
+			console.error("에러가 발생했습니다.");
+		}
+	},
+
+	async updateMenu(category, name, menuId) {
+		const response = await fetch(`${BASE_URL}/category/${category}/menu/${menuId}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ name }),
+		});
+		if (!response.ok) {
+			console.error("에러가 발생했습니다.");
+		}
+		return response.json();
+	},
+
+	async toggleSoldOutMenu(category, menuId) {
+		const response = await fetch(`${BASE_URL}/category/${category}/menu/${menuId}/soldout`, {
+			method: "PUT",
+		});
+		if (!response.ok) {
+			console.error("에러가 발생했습니다.");
+		}
+	},
+
+	async deleteMenu(category, menuId) {
+		const response = await fetch(`${BASE_URL}/category/${category}/menu/${menuId}/`, {
+			method: "DELETE",
+		});
+		if (!response.ok) {
+			console.error("에러가 발생했습니다.");
 		}
 	},
 };
-
-// fetch('url', option)
 
 function App() {
 	this.menu = {
@@ -74,7 +78,6 @@ function App() {
 		desert: [],
 	};
 	this.currentCategory = "espresso";
-
 	this.init = async () => {
 		this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(this.currentCategory);
 		render();
@@ -85,8 +88,8 @@ function App() {
 		const template = this.menu[this.currentCategory]
 			.map((menuItem, index) => {
 				return `
-			<li data-menu-id="${index}" class="menu-list-item d-flex items-center s py-2">
-				<span class="w-100 pl-2 menu-name ${menuItem.soldOut ? "sold-out" : ""} ">${menuItem.name}</span>
+				<li data-menu-id="${menuItem.id}" class="menu-list-item d-flex items-center py-2">
+				<span class="w-100 pl-2 menu-name ${menuItem.isSoldOut ? "sold-out" : ""} ">${menuItem.name}</span>
 				<button
 					type="button" class="bg-gray-50 text-gray-500 text-sm mr-1 menu-sold-out-button"
 				>
@@ -112,8 +115,8 @@ function App() {
 	};
 
 	const updateMenuCount = () => {
-		const menuCount = this.menu[this.currentCategory].length;
-		$(".menu-count").innerText = `총 ${menuCount} 개`;
+		const MenuCount = this.menu[this.currentCategory].length;
+		$(".menu-count").innerText = `총 ${MenuCount} 개`;
 	};
 
 	const addMenuName = async () => {
@@ -128,29 +131,28 @@ function App() {
 		$("#menu-name").value = "";
 	};
 
-	const updateMenuName = (e) => {
+	const updateMenuName = async (e) => {
 		const menuId = e.target.closest("li").dataset.menuId;
 		const $menuName = e.target.closest("li").querySelector(".menu-name");
-		const updatedMenuName = prompt("메뉴명을 수정하세요", $menuName.innerText); // 인자 사용 유의하기
-		this.menu[this.currentCategory][menuId].name = updatedMenuName;
-		store.setLocalStorage(this.menu);
+		const updatedMenuName = prompt("메뉴명을 수정하세요", $menuName.innerText);
+		await MenuApi.updateMenu(this.currentCategory, updatedMenuName, menuId);
+		this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(this.currentCategory);
 		render();
 	};
 
-	const removeMenuName = (e) => {
+	const removeMenuName = async (e) => {
 		if (confirm("정말 삭제하시겠습니까?")) {
 			const menuId = e.target.closest("li").dataset.menuId;
-			this.menu[this.currentCategory].splice(menuId, 1);
-			store.setLocalStorage(this.menu);
+			await MenuApi.deleteMenu(this.currentCategory, menuId);
+			this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(this.currentCategory);
 			render();
 		}
 	};
 
-	const soldOutMenu = (e) => {
+	const soldOutMenu = async (e) => {
 		const menuId = e.target.closest("li").dataset.menuId;
-		this.menu[this.currentCategory][menuId].soldOut =
-			!this.menu[this.currentCategory][menuId].soldOut;
-		store.setLocalStorage(this.menu);
+		await MenuApi.toggleSoldOutMenu(this.currentCategory, menuId);
+		this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(this.currentCategory);
 		render();
 	};
 
@@ -160,12 +162,10 @@ function App() {
 				updateMenuName(e);
 				return;
 			}
-
 			if (e.target.classList.contains("menu-remove-button")) {
 				removeMenuName(e);
 				return;
 			}
-
 			if (e.target.classList.contains("menu-sold-out-button")) {
 				soldOutMenu(e);
 				return;
@@ -175,10 +175,7 @@ function App() {
 		$("#menu-form").addEventListener("submit", (e) => {
 			e.preventDefault();
 		});
-
 		$("#menu-submit-button").addEventListener("click", addMenuName);
-
-		// 메뉴의 이름을 입력받는건
 		$("#menu-name").addEventListener("keypress", (e) => {
 			if (e.key !== "Enter") {
 				return;
@@ -186,11 +183,11 @@ function App() {
 			addMenuName();
 		});
 
+		//메뉴판 관리하기
 		$("nav").addEventListener("click", async (e) => {
 			const isCategoryButton = e.target.classList.contains("cafe-category-name");
 			if (isCategoryButton) {
 				const categoryName = e.target.dataset.categoryName;
-
 				this.currentCategory = categoryName;
 				$("#category-title").innerText = `${e.target.innerText} 메뉴관리`;
 				this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(this.currentCategory);
