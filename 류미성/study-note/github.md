@@ -85,6 +85,7 @@
 
 ### 참고자료
 
+- [[Github] Project planning for developers](https://github.com/features/issues)
 - [[개발 블로그] [Github] 협업시 프로젝트(Projects)와 이슈(Issue) 사용하기](https://devlog-wjdrbs96.tistory.com/227)
 - [[개발 블로그] [Github] Issue, Project 활용](https://velog.io/@dohaeng0/GitHub-Project-Issue-%ED%99%9C%EC%9A%A9)
   <br />
