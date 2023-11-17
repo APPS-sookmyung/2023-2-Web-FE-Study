@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        var users = [
+            {id: 1, name: 'ID', age: 36},
+            {id: 2 , name: 'BJ', age: 32},
+            {id: 3, name: 'JM', age: 32},
+            {id: 4, name: 'PJ', age: 27},
+            {id: 5, name: 'HA', age: 25},
+            {id: 6, name: 'JE', age: 26},
+            {id: 7, name: 'JI', age: 31},
+            {id: 8, name: 'MP', age: 23},
+        ]
+        //1. 명령형 코드
+        //1.1) 30세 이상인 users를 거른다.
+        var temp_users = [];
+        for (i in users){
+            if (users[i].age>=30){
+                temp_users.push(users[i]);
+            }
+        }
+        console.log(temp_users);
+        //1.2) 30세 이상인 Users의 names를 수집한다.
+        var names = [];
+        for (i in temp_users){
+            names.push(temp_users[i].name);
+        }
+        console.log(names);
+        //1.3) 30세 미만인 users를 거른다.
+        var temp_users = [];
+        for (i in users){
+            if (users[i].age<30){
+                temp_users.push(users[i]);
+            }
+        }
+        console.log(temp_users);
+        //1.4) 30세 미만인 users의 age를 수집한다.
+        var ages = [];
+        for (i in temp_users){
+            ages.push(temp_users[i].age);
+        }
+        console.log(ages);
+
+        //응용영 함수, colleciton을 다루는 함수를 만들면서 중복들을 제거하고 함수형 프로그래밍의 특징을 알아보도록 하자
+        //30세 이상을 거르는, 30세 미만을 거르는 코드가 중복이다.
+        //대부분의 코드가 겹치고, 조건부 안의 조건만 살짝 다를 뿐이다.
+
+        //2. _filter, _map으로 리펙토링
+        //함수형 프로그래밍: 원래 있는 값을 직접 변경하지 않고, 변형된 새로운 값을 리턴하는 방식으로 해결해나감
+        //직접 필터링해서 원래 리스트를 바꾸는 것이 아니라, 원래 값을 토대로 해서 필터링을 한다면 나올 값들을 리턴하는 방식으로 코딩해야함
+        function _filter(users, predi){
+            var new_list = [];
+            //추상화의 단위가 객체가 아니라 함수이다. 
+            for (i in users){
+                //위에서 중복되지 않는 유일한 요소가 '조건'이었으므로, 아얘 조건을 함수로 전달할 수 있게 만들어버린다.
+                //이런 함수를 응용영 함수라고 부르는데, 이런 함수는 함수를 받는다. 
+                //고차함수라고도 부른다: 함수를 인자로 받거나, 함수를 리턴하거나, 함수안에 함수를 실행할때
+                if (predi(users[i])){
+                    new_list.push(users[i]);
+                }
+            }
+            return new_list;
+        }
+        function _map(list, mapper){
+            var new_list = [];
+            for (i in list){
+                new_list.push(mapper(list[i]));
+                //데이터 형이 어떻게 생겼는지 하나도 모른다. 
+            }
+            return new_list;
+        }
+
+        console.log("Division Line____________");
+        //내코드: _filter(users, (check)=>{if (check.age>=30) return true; else return false })
+        //강사 코드: _filter(users, function (check) {return user.age >= 30;});
+        var over_30 = _filter(users, (user)=> user.age>=30);
+        console.log(over_30);
+        var names = _map(over_30, user => user.name);
+        console.log(names);
+
+        var under_30 = _filter(users, (user)=> user.age<30);
+        console.log(under_30);
+        var ages = _map(under_30, user => user.age);
+        console.log(ages);
+
+        //console.log(_map([1,2,3], num => num*2));
+        /*console.log(
+            _filter([1,2,3,4], num => num%2)
+        )
+        console.log(
+            _filter([1,2,3,4], num => !(num%2))
+        )
+        */
+        //filter은 users뿐만 아니라 다른 리스트도 적용할 수 있는 함수가 된다
+        //재활용성이 높은 함수가 됨
+        //함수형 프로그래밍은 대입문을 잘 안쓰는 경향이 있다 -> 값을 변경하는게 아니라, 함수를 통과해서 한번에 새로운 값을 만들어 내는 방식이라서
+        console.log(
+            _map(
+                _filter(users, user => user.age>=30),
+                user => user.name
+            )
+        )
+        console.log(
+            _map(
+                _filter(users, user => user.age<30),
+                user => user.age
+            )
+        )
+        //안전성 높고 활용도도 높은 코드를 만들 수 있다. 
+        //map과 filter도 "해당 리스트를 한번씩 돌아가기"라는 코드를 반복한다. 이를 줄여보도록 하자.
+
+
+        function filter_(users, predi){
+            var new_list = [];
+            //추상화의 단위가 객체가 아니라 함수이다. 
+            each_(users, function(val){
+                if (predi(val)) new_list.push(val);
+            })
+            return new_list;
+        }
+        function map_(list, mapper){
+            var new_list = [];
+            each_(list, val => new_list.push(mapper(val)));
+            return new_list;
+        }
+        function each_(list, iter){
+            for (i in list){
+                iter(list[i])
+            }
+            return list;
+        }
+        var over_30 = filter_(users, (user)=> user.age>=30);
+        console.log(over_30);
+        var names = map_(over_30, user => user.name);
+        console.log(names);
+
+        var under_30 = filter_(users, (user)=> user.age<30);
+        console.log(under_30);
+        var ages = map_(under_30, user => user.age);
+        console.log(ages);
+        //필터와 맵의 중복 -> 루프부분 & 해당 i 값을 참조하는 것
+        //코드가 간결해지고 명령적인 코드가 점점 숨게 된다.
+        //선언적인 코드 표현이 되고 더 단순해지고 오류를 내지 않고 실수가 줄어든다.
+
+        //map과 each와 filter같은 함수는 이미 있는 함수이다.
+        console.log(
+            [1,2,3].map(val=>val*2)
+        )
+        console.log(
+            [1,2,3,4,5,6].filter(val => val>4)
+        )
+        //정확히 말하자면 함수가 아니라 method이다. 
+        //순수함수가 아니라 객체 상태에 따라서 결과가 달라지는 특징을 가진다.
+        //우리가 만든 맵과 필터랑 큰 차이가 있다.
+        //map, filter method는 함수가 아니라 [1,2,3,4] 객체의 method이다.
+        //method의 특징은, 해당 클래스에 정의되기 때문에 해당 클래스의 인스턴스에서만 사용할 수 있다는 것이다. -> Array가 아니면 쓸 수 없음
+        //JS에서는 Array가 아니지만 array로 취급 받는 것이 많다. e. jQuery 객체
+        //JQuery는 Array가 아니라 Array-like이다. -> document.querySelectorAll(*)의 결과는 array가 아니라서 map을 할 수가 없다. 
+        //Method는 해당하는 클래스에 준비되어 있지 않은 메서드는 사용할 수 없다.  -> 다양성 지원하기 어렵
+
+        //함수형 프로그래밍은 함수를 먼저 만들고 함수에 맞는 데이터를 구성해서 함수에 적용함 -> 높은 다양성, 유연하고 실용적
+        console.log(
+            map_(document.querySelectorAll("*"), node => node.nodeName)
+        )
+        console.log(
+            //Error이 남 -> constructor이 node list이다.
+            //배열이 아니어도 length가 있어서 위의 _map은 돌아가는 것이다.
+            //document.querySelectorAll("*").map(node=>node.nodeName)
+        )
+        //함수가 먼저 나오는 프로그래밍은 데이터가 있기 전부터 함수가 있게 된다.
+        //데이터가 먼저 나오는 상황에서는 데이터가 있어야 메서드가 생긴다
+        // 객체 지향은 평가의 순서가 굉장히 중요하게 된다. -> 반드시 해당하는 객체가 생겨야 기능을 수행할 수 있음
+        //함수는 혼자 먼저 존재하기 때문에 이 데이터가 생기지 않더라도 평가 시점이 상대적으로 매우 유연해진다. 
+
+        //두번째 함수를 콜백함수라고 부르는 경우가 있는데
+        //사실은 두번째 함수가 어떤 역할을 하는지에 따라 이름이 다르다
+        //callback: 어떤 일들을 다 수행하고 다시 돌려줄 때 맨 끝에서 다시 돌려주는 함수
+        //predicate: 조건을 리턴하는 함수, 돌면서 반복적으로 실행되는 함수, 등
+        //배열 안에 어떤 값이든 들어 있어도 다 수행할 수 있게 만드는 역할을 보조함수가 한다. 
+        map_([1,2,3,4], v => v+10);
+
+        //커링은 함수와 인자를 다루는 기법이다.
+        //함수에 인자를 하나씩 적용해 나가다가 필요한 인자가 모두 채워지면 함수 본체를 실행
+        //JS는 커링이 지원되지 않지만 1급함수 + 평가시점 자유도 = 커링 만들기 가능
+        function _curry(fn){
+            return function (a){
+                return function(b){
+                    return fn(a,b);
+                }
+            }
+        }
+        //curry함수를 사용하면 일반적으로 함수를 정해야지만 커링이 되도록 만든다.
+        var add = _curry(function(a,b){
+            return a+b;
+        });
+        //add는 다음과 같아짐
+        /*
+        function _curry(fn){
+            return function (a){
+                return function(b){
+                    return function(a,b){
+                        return a+b;
+                    }
+                }
+            }
+        }
+        */
+       //a를 먼저 받고 b를 다음에 받은 다음에 받아뒀던 fn을 나중에 실행하는 코드가 됨
+        var add10 = add(10);
+        var add5 = add(5);
+        console.log(add10(5));
+
+        //이런식으로 표기하면 5가 먼저 대입, 3이 나중에 대입해서 a=5, b=3이다. (left to right)
+        console.log(add(5)(3));
+        console.log(add5(3));
+        //본체함수인 _curry함수를 add라는 값으로 들고 있다가 원하는 시점까지 미뤄뒀다가 최종적으로 평가하는 기법이다.
+        //curry함수는 함수형 프로그래밍의 좋은 예다. 
+
+        console.log(add(1,2))
+        //a는 받고 b는 안 받았다고 인식해서 function(b){...}부분을 리턴한다.
+        function curry_(fn){
+            return function (a, b){
+                return arguments.length==2 ? fn(a,b) : b => fn(a,b);
+            }
+        }
+        /*원본함수:
+        function curry_(fn){
+            return function(a,b){
+                if (arguments.length == 2) return fn(a,b);
+                return function(b){
+                    return fn(a,b);
+                }
+            }
+        }
+        */
+        add2 = curry_(function(a,b){return a+b})
+        console.log(add2(1,2))
+        //No function "requires" an argument in JS. The parameters are optional
+        //If you're not making use of a 'b' inside your function then JS complier doesn't care
+        //https://stackoverflow.com/questions/62707352/passing-single-argument-into-a-function-that-requires-multiple-arguments-in-java
+        console.log(add2(1)(2));
+        //이 상태에서 인자가 만약에 2개가 아니면 다시 한번 함수를 return하기 때문에
+        //add10은 함수가 된다. function(b){return fn(a,b)}라는 내용의 함수가 된다
+        // -> 모든 인자가 채워지면 실행되는 함수!
+
+        var sub = curry_((a,b)=>{
+            return a-b;
+        })
+        var sub10 = sub(10);
+        console.log(sub10(5));
+        console.log(sub(10,5))
+        //5-10이 되야하는데 10-5가 나옴
+        function _curryr(fn){
+            return function (a,b){
+                return arguments.length==2 ? fn(a,b): b=> fn(b,a);
+            }
+            //하나씩 들어오면 거꾸로 적용
+        }
+        var subr = _curryr((a,b)=> a-b)
+        var sub10r = subr(10);
+        console.log(sub10r(5));
+        
+        console.log(subr(10)(5))
+
+        //get: 오브젝트에 있는 값을 안전하게 창조하는 함수
+        //오브젝트와 원하는 키를 받아서 결과를 주려고 한다.
+        function _get(obj, key){
+            return obj == null ? undefined : obj[key];
+        }
+        var user1 = users[0];
+        console.log(user1.name);
+        console.log(_get(user1, 'name'));
+
+        //console.log(users[10].name); -> 얘는 에러가 남
+        console.log(_get(users[10], 'name'));
+        //얘는 에러가 나는 대신에 undefined를 리턴한다. => 좀 더 안전하게 get을 함
+        var get_ = _curryr(function(obj, key){
+            return obj == null ? undefined: obj[key];
+        })
+        console.log(get_(user1, 'name'));
+        console.log(get_('name')(user1));
+        var get_name = get_('name');
+        console.log(get_name(user1));
+        console.log(get_name(users[3]));
+        //이러면 위의 코드를 조금 간결하게 바꿀 수 있음
+        /*
+        console.log(
+            _map(
+                _filter(users, user => user.age>=30),
+                _get('name')));
+            )
+        )
+        console.log(
+            _map(
+                _filter(users, user => user.age<30),
+                _get('name')));
+            )
+        )
+        */
+
+        console.clear();
+        //reduce함수 : 추격하는 함수. 모든 데이터들을 함수로 통해 추격시켜서 원하는 새로운 값을 도출하는 함수
+        var slice = Array.prototype.slice;
+        function _rest(list,num){
+            return slice.call(list, num || 1);
+        }
+        function _reduce(list, iter, memo){ 
+            if (arguments.length == 2){
+                memo = list[0];
+                list = _rest(list);
+                //list = list.slice(1); Array의 메서드라서 Array를 통해서만 사용할수있는 함수가 돼버린다.
+            }
+            each_(list, function(val){
+                memo = iter(memo, val);
+            })
+            return memo
+        }
+        console.log(
+            _reduce([1,2,3],function(a,b){
+                return a + b;
+            }, 0)
+        )
+        //결과가 6이 나오길 기대한다.
+        //전달하는 함수 이름이 add라고 하면
+        //memo = add(0,1)
+        //memo = add(memo,2)
+        //memo = add(memo,3)
+        //이런 방식으로 돌아가는 함수이다. 
+        //add(add(add(0,1),2),3)
+        //세번째 인자를 생략하는 방식으로 만들 수 있다.
+        console.log(
+            _reduce([1,2,3],function(a,b){
+                return a + b;
+            })
+        )
+        //Prototype -> Array로 전환하기
+        //var slice = Array.prototype.slice;
+        //slice.call(a,2);
+        //[meta, title, script, script, body, script]..
+        //slice.call(a,2).constructor
+        //-> function Array() {[native code]}
+        //call을 쓰면 arraylike 구조들을 slice 가능하다. 
+
+        console.clear();
+        //파이프는 reduce함수를 통해서 만들 수 있다.
+        //Pipe: 함수를 인자로 받아서 함수를 연속적으로 실행해주는 함수
+        //두개의 함수를 연속적으로 실행하는 함수를 리턴해주는 함수이다.
+        function _pipe(){
+            var fns = arguments;
+            return function(arg){
+                return _reduce(fns, function(arg, fn){
+                    return fn(arg);
+                }, arg)
+            }
+        }
+        var f1 = _pipe(
+            function(a) {return a+1;}, //1+1,
+            function(a) {return a*2;} //2*2
+        )
+        console.log(f1(1));
+        //파이프는 Reduce에 좀 더 특화시켜진 특화 함수이고 보다 추상화된 레벨의 함수가 reduce이다.
+        //함수들이라는 배열을 통해서 인자를 연속적으로 적용한 최종 결과로 추격하는 함수이다. 
+        //객체를 줄이기 위해서 []를 안씀
+    </script>
+</body>
+</html>
