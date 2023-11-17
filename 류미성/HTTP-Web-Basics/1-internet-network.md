@@ -1,4 +1,4 @@
-### 인터넷통신
+# 1장 인터넷통신
 
 - 데이터가 수많은 복잡한 상황을 거쳐서 목적지까지 안전하게 도착해야할 필요가 있음
 
@@ -21,9 +21,9 @@
 
 - 인터넷 프로토콜 스택의 4계층
 
-  ![인터넷 프로토콜 스택의 4계층](img/image-1.png)
+  <img src="img/1-1.png" alt="대체 텍스트" style="width:400px;">
 
-  ![프로토콜 계층](img/image-2.png)
+  <img src="img/1-2.png" alt="대체 텍스트" style="width:600px;">
 
 - `패킷(packet)`? 네트워크를 통해 전송하기 쉽도록 자른 데이터의 전송 단위 (소포를 뜻하는 용어, 소화물(package) + 덩어리(bucket)의 합성어)
 
@@ -48,7 +48,7 @@
   SYN은 'synchronize sequence numbers', 그리고 ACK는'acknowledgment' 의 약자
   ```
 
-  ![3-way handshake](img/image-3.png)
+  <img src="img/1-3.png" alt="대체 텍스트" style="width:600px;">
 
 - `UDP / 사용자 데이터그램 프로토콜(User Datagram Protocol)`
   - 하얀 도화지에 비유(기능이 거의 없음)
@@ -65,8 +65,8 @@
 - 배가 도착하는 항구라는 의미
 - 같은 IP 내에서 프로세스 구분
   - 패킷에 포트번호까지 포함되어 있어서, 도착지에 보낼 수 있음
-    ![TCP/IP 패킷 정보](img/image-5.png)
-    ![PORT - 같은 IP 내에서 프로세스 구분](img/image-4.png)
+    <img src="img/1-4.png" alt="대체 텍스트" style="width:400px;">
+    <img src="img/1-5.png" alt="대체 텍스트" style="width:400px;">
 - 포트 번호
   - 0 ~ 65535 할당 가능
     • 0 ~ 1023: 잘 알려진 포트, 사용하지 않는 것이 좋음
@@ -85,7 +85,7 @@
   - 도메인 명 → IP주소 (변환)
 - 따라서, DNS가 있으면 기억하기 어려운 IP주소를 알려주고, IP가 변경되는 문제를 해결해줌
 
-  ![DNS 사용](img/image-6.png)
+  <img src="img/1-6.png" alt="대체 텍스트" style="width:400px;">
 
 ### 정리
 
