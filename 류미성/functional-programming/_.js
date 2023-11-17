@@ -5,6 +5,7 @@ function _filter(users, predi) {
 			new_list.push(val);
 		}
 	});
+	// 단순하고 간결한 코드로 재탄상
 	// for (let i = 0; i < users.length; i++) {
 	// 	if (predi(users[i])) {
 	// 		// if (function (user) {return user.age >= 30;}(users[i])) {
