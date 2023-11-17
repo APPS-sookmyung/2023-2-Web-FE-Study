@@ -2,7 +2,9 @@
 
 - update: 2023.11.17
 
-### `Projects`
+<br />
+
+# `Projects`
 
 > 프로젝트는 작업 현황과 진행도를 볼 수 있는 메뉴이다. 이슈, PR(풀 리퀘스트)들을 하나의 작업(task)으로 구분해 그 작업이 현재 어느 정도 진행되었는지 확인할 수 있다.
 
@@ -19,25 +21,33 @@
 - 원하는 template 선택
 
   - Table
+
     <img src="img/github-1.png" alt="대체 텍스트" style="width:600px;">
+
   - Board
+
     <img src="img/github-2.png" alt="대체 텍스트" style="width:600px;">
+
   - Roadmap
+
     <img src="img/github-3.png" alt="대체 텍스트" style="width:600px;">
 
 - 프로젝트 추가하기
+
   <img src="img/github-4.png" alt="대체 텍스트" style="width:600px;">
   <img src="img/github-5.png" alt="대체 텍스트" style="width:600px;">
 
 - 다양한 형태의 view
+
   <img src="img/github-6.png" alt="대체 텍스트" style="width:600px;">
   <img src="img/github-7.png" alt="대체 텍스트" style="width:600px;">
   <img src="img/github-8.png" alt="대체 텍스트" style="width:600px;">
 
-- 기타 다른 프로젝트 참고 (출처: 2023-POCHAK-server)
+### `Projects` 레퍼런스 (출처: 2023-POCHAK-server)
+
   <img src="img/github-9.png" alt="대체 텍스트" style="width:600px;">
 
-### `Issue`
+# `Issue`
 
 > 이슈는 작업의 버그 수정, 새로운 추가될 기능, 개선해야하는 기능 등등 모든 것이 될 수 있다. 모든 활동 내역에 대해 이슈를 등록하고 그 이슈를 기반으로 작업을 진행한다. 그리고 이슈를 만들면 이슈를 열었다(open)라고 하고, 작업이 끝나 이슈를 정리하면 이슈를 닫았다(close)라고 말한다.
 
@@ -48,19 +58,29 @@
 ### `Issue` 주요 기능
 
 - Assignees: 담당자
+
   <img src="img/github-10.png" alt="대체 텍스트" style="width:400px;">
+
 - Labels: 해당 작업의 유형 (참고: Label 항목에서 bug 등 기본항목을 전부 지우는 게 가능하고, 취향대로 커스터마이징이 가능하다.)
+
   <img src="img/github-11.png" alt="대체 텍스트" style="width:400px;">
+
 - Projects : 연결할 project (진행도를 한번에 볼 수 있는 메뉴)
+
   <img src="img/github-12.png" alt="대체 텍스트" style="width:400px;">
+
 - Milestone : 프로젝트가 도달해야하는 목표지점
+
   <img src="img/github-13.png" alt="대체 텍스트" style="width:400px;">
 
   - Milestone을 사용하면, 한 가지의 목표에 여러 이슈가 등록되어 있을 때 해당 목표의 진행도가 얼마나 되는지 게이지 바 형태로 볼 수 있다. (위 이미지에서 [테스트] 를 선택했을 때)
+
     <img src="img/github-14.png" alt="대체 텍스트" style="width:400px;">
 
-- 기타 다른 프로젝트 참고 (출처: 2023-POCHAK-server)
+### `Issue` 레퍼런스 (출처: 2023-POCHAK-server)
+
   <img src="img/github-15.png" alt="대체 텍스트" style="width:600px;">
+
   <img src="img/github-16.png" alt="대체 텍스트" style="width:600px;">
 
 ### 참고자료
